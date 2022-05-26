@@ -1,0 +1,29 @@
+specVersion: 0.0.1
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: undefined
+    network: rinkeby
+    source:
+      address: "0x00A9dc5983745B50Bc116Ca4E304FE5f2bB5521b"
+      abi: YearnRouter
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Deposit
+        - OwnershipTransferred
+        - Withdraw
+      abis:
+        - name: YearnRouter
+          file: ./abis/YearnRouter.json
+      eventHandlers:
+        - event: Deposit(address,address,uint256,uint256)
+          handler: handleDeposit
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: Withdraw(address,address,uint256,uint256)
+          handler: handleWithdraw
+      file: ./src/yearn-router.ts
