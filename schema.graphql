@@ -1,6 +1,49 @@
-type ExampleEntity @entity {
+####################
+### VAULTS ###
+####################
+
+type Vault @entity {
+  "address"
   id: ID!
-  count: BigInt!
-  recipient: Bytes! # address
-  vault: Bytes! # address
+  usersCount: Int!
+  totalSharesTVL: BigInt!
+  users: [VaultUser!]! @derivedFrom(field: "vault")
+}
+
+############
+### USER ###
+############
+
+type User @entity {
+  "address"
+  id: ID!
+  vaults: [VaultUser!]! @derivedFrom(field: "user")
+}
+
+type VaultUser @entity {
+  "${vault address}-${user address}"
+  id: ID!
+  vault: Vault!
+  user: User!
+  sharesTVL: BigInt!
+}
+
+############
+### LOGS ###
+############
+
+type EventLog @entity {
+  id: ID!
+  type: EventType!
+  contract: Bytes!
+  createdAtBlock: BigInt!
+  createdAtDate: BigInt!
+  txHash: Bytes!
+  user: User!
+  data: String! # or Bytes!
+}
+
+enum EventType {
+  DEPOSIT
+  WITHDRAW
 }

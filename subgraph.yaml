@@ -1,29 +1,51 @@
-specVersion: 0.0.1
+specVersion: 0.0.4
+repository: https://github.com/akropolisio/yearn-router-subgraph
 schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: undefined
-    network: rinkeby
+    name: YearnRouter
+    network: mainnet
     source:
-      address: "0x00A9dc5983745B50Bc116Ca4E304FE5f2bB5521b"
+      address: 'TODO'
       abi: YearnRouter
+      startBlock: 10741442
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
-        - Deposit
-        - OwnershipTransferred
-        - Withdraw
+        - Vault
+        - User
+        - VaultUser
+        - EventLog
       abis:
         - name: YearnRouter
           file: ./abis/YearnRouter.json
       eventHandlers:
         - event: Deposit(address,address,uint256,uint256)
           handler: handleDeposit
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
         - event: Withdraw(address,address,uint256,uint256)
           handler: handleWithdraw
-      file: ./src/yearn-router.ts
+      file: ./src/mappings/yearn-router.ts
+templates:
+  - kind: ethereum/contract
+    name: Vault
+    network: mainnet
+    source:
+      abi: Vault
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Vault
+        - User
+        - VaultUser
+      abis:
+        - name: Vault
+          file: ./abis/Vault.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/mappings/vault.ts
