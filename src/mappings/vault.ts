@@ -3,8 +3,10 @@ import { Transfer } from '../../generated/templates/Vault/Vault';
 import { createOrLoadVault, createOrLoadVaultUser, createUser } from '../entities';
 import { ZERO_ADDRESS, max } from '../utils';
 
-export function handleTransfer(event: Transfer) {
-  const { sender: userAddress, value: shares, receiver: receiverAddress } = event.params;
+export function handleTransfer(event: Transfer): void {
+  const userAddress = event.params.sender;
+  const shares = event.params.value;
+  const receiverAddress = event.params.receiver;
   const vaultAddress = event.address;
 
   if (userAddress.toHex() == ZERO_ADDRESS) {
