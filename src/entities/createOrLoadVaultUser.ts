@@ -1,6 +1,6 @@
 import { Address, BigInt } from '@graphprotocol/graph-ts';
 import { VaultUser } from '../../generated/schema';
-import { getVaultUserID, min } from '../utils';
+import { getVaultUserID } from '../utils';
 
 export function createOrLoadVaultUser(vaultAddress: Address, userAddress: Address): VaultUser {
   let vaultUser = VaultUser.load(vaultAddress.toHex());

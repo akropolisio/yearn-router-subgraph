@@ -1,15 +1,12 @@
 import { Deposit, Withdraw } from '../../generated/YearnRouter/YearnRouter';
-import { User } from '../../generated/schema';
 import { createEventLog } from '../entities/createEventLog';
 import { EventType } from '../utils';
-import { createOrLoadVault, createOrLoadVaultUser } from '../entities';
+import { createOrLoadVault, createOrLoadVaultUser, createUser } from '../entities';
 
 export function handleDeposit(event: Deposit): void {
   const { vault: vaultAddress, recipient: userAddress, shares } = event.params;
 
-  const user = new User(userAddress.toHex());
-  user.save();
-
+  createUser(userAddress);
   const vault = createOrLoadVault(vaultAddress);
   const vaultUser = createOrLoadVaultUser(vaultAddress, userAddress);
 
