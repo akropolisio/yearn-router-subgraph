@@ -1,5 +1,5 @@
 import { BigInt } from '@graphprotocol/graph-ts';
 
-export function min(...args: BigInt[]): BigInt {
-  return args.sort(BigInt.compare)[0];
+export function min(a: BigInt, b: BigInt): BigInt {
+  return b.lt(a) ? b : a;
 }

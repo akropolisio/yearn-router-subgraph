@@ -2,12 +2,10 @@
   "name": "yearn-router-subgraph",
   "license": "UNLICENSED",
   "scripts": {
-    "codegen": "graph codegen",
-    "build": "graph build",
-    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ yearn-router-subgraph",
-    "create-local": "graph create --node http://localhost:8020/ yearn-router-subgraph",
-    "remove-local": "graph remove --node http://localhost:8020/ yearn-router-subgraph",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 yearn-router-subgraph"
+    "codegen": "rm -rf ./generated && graph codegen",
+    "build": "yarn codegen && graph build",
+    "deploy": "yarn codegen && yarn graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ in19farkt/akropolis-yearn-router --access-token ${THEGRAPH_ACCESS_TOKEN}",
+    "display-pending-errors": "curl --location --request POST 'https://api.thegraph.com/index-node/graphql' --data-raw '{\"query\":\"{ indexingStatusForPendingVersion(subgraphName: \\\"in19farkt/akropolis-yearn-router\\\") { subgraph fatalError { message } nonFatalErrors { message } } }\"}'"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.30.1",

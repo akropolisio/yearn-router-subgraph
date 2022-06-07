@@ -1,24 +1,44 @@
 import { BigInt } from '@graphprotocol/graph-ts';
 import { Transfer } from '../../generated/templates/Vault/Vault';
-import { createOrLoadVault, createOrLoadVaultUser } from '../entities';
+import { createOrLoadVault, createOrLoadVaultUser, createUser, loadVaultUser } from '../entities';
 import { ZERO_ADDRESS, min } from '../utils';
 
-export function handleTransfer(event: Transfer) {
-  const { sender: userAddress, value: shares, receiver } = event.params;
+export function handleTransfer(event: Transfer): void {
+  const userAddress = event.params.sender;
+  const transferredShares = event.params.value;
+  const receiverAddress = event.params.receiver;
   const vaultAddress = event.address;
 
-  if (userAddress.toHex() == ZERO_ADDRESS) {
+  const vaultUser = loadVaultUser(vaultAddress, userAddress);
+  const sharesTVLBeforeTransfer = vaultUser ? vaultUser.sharesTVL : BigInt.zero();
+
+  if (
+    userAddress.toHex() == ZERO_ADDRESS ||
+    !vaultUser ||
+    sharesTVLBeforeTransfer.le(BigInt.zero())
+  ) {
     return;
   }
 
+  const shares = min(transferredShares, sharesTVLBeforeTransfer);
+
+  vaultUser.sharesTVL = sharesTVLBeforeTransfer.minus(shares);
+
   const vault = createOrLoadVault(vaultAddress);
-  const vaultUser = createOrLoadVaultUser(vaultAddress, userAddress);
-
-  vault.totalSharesTVL = min(vault.totalSharesTVL.minus(shares), BigInt.zero());
-  vaultUser.sharesTVL = min(vaultUser.sharesTVL.minus(shares), BigInt.zero());
-
-  if (vaultUser.sharesTVL.isZero() && receiver.toHex() == ZERO_ADDRESS) {
+  if (vaultUser.sharesTVL.isZero()) {
     vault.usersCount -= 1;
+  }
+
+  if (receiverAddress.toHex() === ZERO_ADDRESS) {
+    vault.totalSharesTVL = vault.totalSharesTVL.minus(shares);
+  } else {
+    createUser(receiverAddress);
+    const newVaultUser = createOrLoadVaultUser(vaultAddress, receiverAddress);
+    if (newVaultUser.sharesTVL.isZero()) {
+      vault.usersCount += 1;
+    }
+    newVaultUser.sharesTVL = newVaultUser.sharesTVL.plus(shares);
+    newVaultUser.save();
   }
 
   vault.save();

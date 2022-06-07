@@ -1,13 +1,13 @@
 import { Address, ethereum } from '@graphprotocol/graph-ts';
 
 import { EventLog } from '../../generated/schema';
-import { EventType, getEventLogID } from '../utils';
+import { getEventLogID } from '../utils';
 
 export function createEventLog(
   event: ethereum.Event,
   contract: Address,
   userAddress: Address,
-  type: EventType
+  type: string
 ): EventLog {
   let eventLog = new EventLog(getEventLogID(event));
 

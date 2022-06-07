@@ -1,15 +1,13 @@
 import { Deposit, Withdraw } from '../../generated/YearnRouter/YearnRouter';
-import { User } from '../../generated/schema';
 import { createEventLog } from '../entities/createEventLog';
-import { EventType } from '../utils';
-import { createOrLoadVault, createOrLoadVaultUser } from '../entities';
+import { createOrLoadVault, createOrLoadVaultUser, createUser } from '../entities';
 
 export function handleDeposit(event: Deposit): void {
-  const { vault: vaultAddress, recipient: userAddress, shares } = event.params;
+  const vaultAddress = event.params.vault;
+  const userAddress = event.params.recipient;
+  const shares = event.params.shares;
 
-  const user = new User(userAddress.toHex());
-  user.save();
-
+  createUser(userAddress);
   const vault = createOrLoadVault(vaultAddress);
   const vaultUser = createOrLoadVaultUser(vaultAddress, userAddress);
 
@@ -22,12 +20,12 @@ export function handleDeposit(event: Deposit): void {
   vault.save();
   vaultUser.save();
 
-  createEventLog(event, vaultAddress, userAddress, EventType.DEPOSIT);
+  createEventLog(event, vaultAddress, userAddress, 'DEPOSIT');
 }
 
 export function handleWithdraw(event: Withdraw): void {
-  const { vault: vaultID } = event.params;
-  const userID = event.transaction.from;
+  const vaultAddress = event.params.vault;
+  const userAddress = event.transaction.from;
 
-  createEventLog(event, vaultID, userID, EventType.WITHDRAW);
+  createEventLog(event, vaultAddress, userAddress, 'WITHDRAW');
 }
