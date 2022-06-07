@@ -1,30 +1,36 @@
 import { BigInt } from '@graphprotocol/graph-ts';
 import { Transfer } from '../../generated/templates/Vault/Vault';
-import { createOrLoadVault, createOrLoadVaultUser, createUser } from '../entities';
-import { ZERO_ADDRESS, max } from '../utils';
+import { createOrLoadVault, createOrLoadVaultUser, createUser, loadVaultUser } from '../entities';
+import { ZERO_ADDRESS, min } from '../utils';
 
 export function handleTransfer(event: Transfer): void {
   const userAddress = event.params.sender;
-  const shares = event.params.value;
+  const transferredShares = event.params.value;
   const receiverAddress = event.params.receiver;
   const vaultAddress = event.address;
 
-  if (userAddress.toHex() == ZERO_ADDRESS) {
+  const vaultUser = loadVaultUser(vaultAddress, userAddress);
+  const sharesTVLBeforeTransfer = vaultUser ? vaultUser.sharesTVL : BigInt.zero();
+
+  if (
+    userAddress.toHex() == ZERO_ADDRESS ||
+    !vaultUser ||
+    sharesTVLBeforeTransfer.le(BigInt.zero())
+  ) {
     return;
   }
 
-  createUser(userAddress);
+  const shares = min(transferredShares, sharesTVLBeforeTransfer);
+
+  vaultUser.sharesTVL = sharesTVLBeforeTransfer.minus(shares);
+
   const vault = createOrLoadVault(vaultAddress);
-  const vaultUser = createOrLoadVaultUser(vaultAddress, userAddress);
-
-  vaultUser.sharesTVL = max(vaultUser.sharesTVL.minus(shares), BigInt.zero());
-
   if (vaultUser.sharesTVL.isZero()) {
     vault.usersCount -= 1;
   }
 
-  if (receiverAddress.toHex() == ZERO_ADDRESS) {
-    vault.totalSharesTVL = max(vault.totalSharesTVL.minus(shares), BigInt.zero());
+  if (receiverAddress.toHex() === ZERO_ADDRESS) {
+    vault.totalSharesTVL = vault.totalSharesTVL.minus(shares);
   } else {
     createUser(receiverAddress);
     const newVaultUser = createOrLoadVaultUser(vaultAddress, receiverAddress);
@@ -38,4 +44,3 @@ export function handleTransfer(event: Transfer): void {
   vault.save();
   vaultUser.save();
 }
-
