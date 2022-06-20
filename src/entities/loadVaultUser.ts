@@ -4,7 +4,7 @@ import { getVaultUserID } from '../utils';
 
 export function loadVaultUser(vaultAddress: Address, userAddress: Address): VaultUser | null {
   const id = getVaultUserID(vaultAddress, userAddress);
-  let vaultUser = VaultUser.load(id);
+  const vaultUser = VaultUser.load(id);
 
   return vaultUser;
 }

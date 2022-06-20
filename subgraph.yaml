@@ -22,6 +22,10 @@ dataSources:
       abis:
         - name: YearnRouter
           file: ./abis/YearnRouter.json
+        - name: Vault
+          file: ./abis/Vault.json
+        - name: ERC20Detailed
+          file: ./abis/ERC20Detailed.json
       eventHandlers:
         - event: Deposit(address,address,uint256,uint256)
           handler: handleDeposit
@@ -45,7 +49,27 @@ templates:
       abis:
         - name: Vault
           file: ./abis/Vault.json
+        - name: ERC20Detailed
+          file: ./abis/ERC20Detailed.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
       file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: ERC20Detailed
+    network: mainnet
+    source:
+      abi: ERC20Detailed
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+      abis:
+        - name: ERC20Detailed
+          file: ./abis/ERC20Detailed.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/mappings/token.ts

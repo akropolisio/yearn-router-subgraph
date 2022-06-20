@@ -11,7 +11,7 @@ export function handleDeposit(event: Deposit): void {
   const vault = createOrLoadVault(vaultAddress);
   const vaultUser = createOrLoadVaultUser(vaultAddress, userAddress);
 
-  vault.totalSharesTVL = vault.totalSharesTVL.plus(shares);
+  vault.sharesTVL = vault.sharesTVL.plus(shares);
   if (vaultUser.sharesTVL.isZero()) {
     vault.usersCount += 1;
   }
@@ -20,12 +20,12 @@ export function handleDeposit(event: Deposit): void {
   vault.save();
   vaultUser.save();
 
-  createEventLog(event, vaultAddress, userAddress, 'DEPOSIT');
+  createEventLog(event, vaultAddress, userAddress, 'YEARN_ROUTER_DEPOSIT');
 }
 
 export function handleWithdraw(event: Withdraw): void {
   const vaultAddress = event.params.vault;
   const userAddress = event.transaction.from;
 
-  createEventLog(event, vaultAddress, userAddress, 'WITHDRAW');
+  createEventLog(event, vaultAddress, userAddress, 'YEARN_ROUTER_WITHDRAW');
 }

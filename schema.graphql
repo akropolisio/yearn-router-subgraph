@@ -5,8 +5,9 @@
 type Vault @entity {
   "address"
   id: ID!
+  depositToken: Token!
   usersCount: Int!
-  totalSharesTVL: BigInt!
+  sharesTVL: BigInt!
   users: [VaultUser!]! @derivedFrom(field: "vault")
 }
 
@@ -44,6 +45,18 @@ type EventLog @entity {
 }
 
 enum EventType {
-  DEPOSIT
-  WITHDRAW
+  YEARN_ROUTER_DEPOSIT
+  YEARN_ROUTER_WITHDRAW
+}
+
+#############
+### OTHER ###
+#############
+
+type Token @entity {
+  "address"
+  id: ID!
+  name: String!
+  symbol: String!
+  decimals: Int!
 }
