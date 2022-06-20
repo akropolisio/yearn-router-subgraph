@@ -16,6 +16,7 @@ export function createOrLoadVault(vaultAddress: Address): Vault {
     vault.sharesTVL = BigInt.zero();
     vault.usersCount = 0;
     vault.depositToken = createToken(contract.token()).id;
+    vault.lpToken = createToken(vaultAddress).id;
     vault.save();
   }
 

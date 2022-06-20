@@ -6,6 +6,7 @@ type Vault @entity {
   "address"
   id: ID!
   depositToken: Token!
+  lpToken: Token!
   usersCount: Int!
   sharesTVL: BigInt!
   users: [VaultUser!]! @derivedFrom(field: "vault")
