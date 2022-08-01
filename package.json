@@ -1,14 +1,14 @@
 {
+  "version": "0.0.1",
   "name": "yearn-router-subgraph",
   "license": "UNLICENSED",
   "scripts": {
     "build": "graph build",
-    "pre-build": "rm -rf ./generated && graph codegen",
-    "deploy-studio": "yarn pre-build && graph deploy --studio --version-label ${VERSION} akropolis-yearn-router --deploy-key ${STUDIO_DEPLOY_KEY}"
+    "prebuild": "rm -rf ./generated && graph codegen",
+    "deploy": "yarn prebuild && graph deploy --studio --version-label ${VERSION} --deploy-key ${STUDIO_DEPLOY_KEY} akropolis-yearn-router"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.33.0",
+    "@graphprotocol/graph-cli": "^0.31.0",
     "@graphprotocol/graph-ts": "0.27.0"
-  },
-  "version": "0.0.1"
+  }
 }

@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      THEGRAPH_ACCESS_TOKEN: ${{ secrets.THEGRAPH_ACCESS_TOKEN }}
+      STUDIO_DEPLOY_KEY: ${{ secrets.STUDIO_DEPLOY_KEY }}
 
     steps:
       - uses: actions/checkout@v2
@@ -22,5 +22,10 @@ jobs:
       - name: Install dependencies
         run: yarn
 
+      - name: Save package version from package.json to env.PACKAGE_VERSION
+        uses: nyaa8/package-version@v1
+
       - name: Build and deploy
         run: yarn deploy
+        env:
+          VERSION: v${{ env.PACKAGE_VERSION }}
